@@ -17,20 +17,17 @@
         Калькулятор ожидания дня рождения
       </div>
       <div class="card-body">
-        {% if '/delete/' in request.path %}
-          <p>{{ data.first_name }} {{ data.last_name }}</p>
-          <p>{{ data.birthday }}</p>
-          <form method="post">
-            {% csrf_token %}
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% if '/delete/' in request.path %}
+            <p>{{ data.first_name }} {{ data.last_name }}</p>
+            <p>{{ data.birthday }}</p>
             {% bootstrap_button button_type="submit" content="Удалить" %}
-          </form>
-        {% else %}
-          <form method="post">
-            {% csrf_token %}
+          {% else %}
             {% bootstrap_form form %}
             {% bootstrap_button button_type="submit" content="Отправить" %}
-          </form>
-        {% endif %}
+          {% endif %}
+        </form>
       </div>
     </div>
     {% if form.is_valid %}
