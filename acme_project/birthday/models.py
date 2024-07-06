@@ -1,5 +1,7 @@
 from django.db import models
 
+from .validators import real_age
+
 
 class Birthday(models.Model):
     first_name = models.CharField(
@@ -13,5 +15,19 @@ class Birthday(models.Model):
         max_length=20
     )
     birthday = models.DateField(
-        'Дата рождения'
+        'Дата рождения',
+        validators=(real_age,)
     )
+
+    class Meta:
+        verbose_name = 'день рождения'
+        verbose_name_plural = 'Дни рождения'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('first_name', 'last_name', 'birthday'),
+                name='Уникальный запрос для пользователя'
+            ),
+        )
+
+    def __str__(self) -> str:
+        return f'{self.first_name} {self.last_name}'
