@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 from .validators import real_age
 
@@ -36,3 +37,6 @@ class Birthday(models.Model):
 
     def __str__(self) -> str:
         return f'{self.first_name} {self.last_name}'
+
+    def get_absolute_url(self):
+        return reverse("model_detail", kwargs={"pk": self.pk})
