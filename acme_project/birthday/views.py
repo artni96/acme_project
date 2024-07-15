@@ -85,5 +85,3 @@ class BirthdayDetail(DetailView):
         return context
 
 
-class HomePage(TemplateView):
-    template_name = 'pages/index.html'
