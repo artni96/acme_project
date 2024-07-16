@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 
 from .validators import real_age
+from users.models import CustomUser
 
 
 class Birthday(models.Model):
@@ -24,6 +25,12 @@ class Birthday(models.Model):
         blank=True,
         upload_to='birthdays_images'
     )
+    author = models.ForeignKey(
+        CustomUser,
+        verbose_name='Автор записи',
+        on_delete=models.CASCADE,
+        null=True
+    )
 
     class Meta:
         verbose_name = 'день рождения'
@@ -39,4 +46,28 @@ class Birthday(models.Model):
         return f'{self.first_name} {self.last_name}'
 
     def get_absolute_url(self):
-        return reverse("model_detail", kwargs={"pk": self.pk})
+        return reverse("birthday:detail", kwargs={"pk": self.pk})
+
+
+class Congratulation(models.Model):
+    text = models.TextField(
+        'Поздравление'
+    )
+    birthday = models.ForeignKey(
+        Birthday,
+        on_delete=models.CASCADE,
+        verbose_name='день рождения',
+        related_name='congratulations'
+    )
+    author = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        verbose_name='автор'
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='время создания поздраления'
+    )
+
+    class Meta:
+        ordering = ('created_at',)

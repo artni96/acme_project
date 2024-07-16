@@ -1,12 +1,14 @@
 from typing import Any
-from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404, redirect
-from .forms import BirthdayForm
-from .utils import calculate_birthday_countdown
-from .models import Birthday
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView, TemplateView
-from django.urls import reverse_lazy
 
+from django.urls import reverse_lazy
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView)
+
+from .forms import BirthdayForm
+from .models import Birthday
+from .utils import calculate_birthday_countdown
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404
 
 # def birthday(request, pk=None):
 #     if pk is not None:
@@ -59,19 +61,31 @@ class BirthdayListView(ListView):
     paginate_by = 2
 
 
-class BirthdayCreateView(CreateView):
+class BirthdayCreateView(LoginRequiredMixin, CreateView):
     model = Birthday
     form_class = BirthdayForm
 
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
-class BirthdayUpdateView(UpdateView):
+
+class BirthdayUpdateView(LoginRequiredMixin, UpdateView):
     model = Birthday
     form_class = BirthdayForm
 
+    def dispatch(self, request, *args, **kwargs):
+        get_object_or_404(Birthday, pk=kwargs['pk'], author=request.user)
+        return super().dispatch(request, *args, **kwargs)
 
-class BirthdayDelete(DeleteView):
+
+class BirthdayDelete(LoginRequiredMixin, DeleteView):
     model = Birthday
     success_url = reverse_lazy('birthday:list')
+
+    def dispatch(self, request, *args, **kwargs):
+        get_object_or_404(Birthday, pk=kwargs['pk'], author=request.user)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class BirthdayDetail(DetailView):
@@ -83,5 +97,3 @@ class BirthdayDetail(DetailView):
             self.object.birthday
         )
         return context
-
-
